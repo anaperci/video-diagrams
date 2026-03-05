@@ -47,12 +47,13 @@ Retorne APENAS o JSON válido, sem markdown, sem explicações. O JSON deve segu
   ]
 }`;
 
-export default async function handler(req: any, res: any) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { prompt } = req.body ?? {};
+  const body = req.body || {};
+  const prompt = body.prompt;
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "Prompt is required" });
   }
@@ -80,11 +81,13 @@ export default async function handler(req: any, res: any) {
 
     if (!response.ok) {
       const errBody = await response.text();
-      return res.status(502).json({ error: `API error ${response.status}: ${errBody.slice(0, 200)}` });
+      return res.status(502).json({ error: "API error " + response.status + ": " + errBody.slice(0, 200) });
     }
 
     const message = await response.json();
-    const text = message.content?.[0]?.type === "text" ? message.content[0].text : "";
+    const text = message.content && message.content[0] && message.content[0].type === "text"
+      ? message.content[0].text
+      : "";
 
     let jsonStr = text.trim();
     if (jsonStr.startsWith("```")) {
@@ -93,7 +96,7 @@ export default async function handler(req: any, res: any) {
 
     const diagram = JSON.parse(jsonStr);
     return res.status(200).json(diagram);
-  } catch (error: any) {
+  } catch (error) {
     return res.status(500).json({ error: error.message || "Failed to generate diagram" });
   }
-}
+};
