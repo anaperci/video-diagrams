@@ -1,0 +1,26 @@
+{
+  "name": "video-diagrams",
+  "version": "1.0.0",
+  "description": "Animated technical diagrams for Reels/Stories with Remotion",
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion render TechDiagram out/diagram.mp4",
+    "render": "remotion render"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.434",
+    "@remotion/fonts": "^4.0.434",
+    "@remotion/tailwind": "^4.0.434",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.434",
+    "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  }
+}

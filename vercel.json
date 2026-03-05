@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npx remotion bundle",
+  "outputDirectory": "build",
+  "installCommand": "npm install"
+}
