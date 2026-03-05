@@ -1,6 +1,7 @@
 import React from "react";
 import { Composition } from "remotion";
-import { TechDiagram, DIAGRAM_DURATION } from "./compositions/TechDiagram";
+import { TechDiagram, calcDuration } from "./compositions/TechDiagram";
+import { DEFAULT_DIAGRAM } from "./types";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -8,7 +9,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="TechDiagram"
         component={TechDiagram}
-        durationInFrames={DIAGRAM_DURATION}
+        durationInFrames={calcDuration(DEFAULT_DIAGRAM)}
         fps={30}
         width={1080}
         height={1920}
