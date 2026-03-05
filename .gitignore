@@ -4,3 +4,4 @@ out/
 .remotion/
 dist/
 .DS_Store
+.vercel

@@ -4,19 +4,24 @@
   "description": "Animated technical diagrams for Reels/Stories with Remotion",
   "scripts": {
     "dev": "remotion studio",
-    "build": "remotion render TechDiagram out/diagram.mp4",
-    "render": "remotion render"
+    "dev:web": "vite",
+    "build": "vite build",
+    "render": "remotion render",
+    "render:mp4": "remotion render TechDiagram out/diagram.mp4"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.434",
     "@remotion/fonts": "^4.0.434",
+    "@remotion/player": "^4.0.434",
     "@remotion/tailwind": "^4.0.434",
+    "@vitejs/plugin-react": "^5.1.4",
     "autoprefixer": "^10.4.27",
     "postcss": "^8.5.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "remotion": "^4.0.434",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "vite": "^7.3.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

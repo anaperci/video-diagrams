@@ -5,8 +5,8 @@ import {
   spring,
   interpolate,
   AbsoluteFill,
-  loadFont,
 } from "remotion";
+import { loadFont } from "@remotion/fonts";
 
 // ============================================
 // CONSTANTS (edit these to customize)
