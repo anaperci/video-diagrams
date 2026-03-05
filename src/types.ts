@@ -35,6 +35,15 @@ export const FORMATS: Record<FormatType, { width: number; height: number; label:
   landscape: { width: 1920, height: 1080, label: "Feed paisagem (16:9)" },
 };
 
+export type AnimMode = "buildup" | "static";
+export type AnimSpeed = "fast" | "medium" | "slow";
+
+export const STAGGER_BY_SPEED: Record<AnimSpeed, number> = {
+  fast: 3,
+  medium: 5,
+  slow: 8,
+};
+
 export interface DiagramData {
   title: string;
   watermark: string;
@@ -44,6 +53,9 @@ export interface DiagramData {
   connections: Connection[];
   tools: ToolItem[];
   toolGroupLabel: string;
+  animMode?: AnimMode;
+  animSpeed?: AnimSpeed;
+  staticDuration?: number; // seconds, only used in static mode
 }
 
 export const DEFAULT_THEME: DiagramTheme = {
