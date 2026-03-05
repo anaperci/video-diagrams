@@ -1,3 +1,13 @@
+const THEME_PRESETS = {
+  midnight: { bgColor: "#0a0a0a", textColor: "#ffffff", borderColor: "rgba(255, 255, 255, 0.3)", borderColorPrimary: "rgba(255, 255, 255, 0.6)", bgNode: "rgba(255, 255, 255, 0.05)" },
+  light: { bgColor: "#f5f5f7", textColor: "#1d1d1f", borderColor: "rgba(0, 0, 0, 0.15)", borderColorPrimary: "rgba(0, 0, 0, 0.4)", bgNode: "rgba(0, 0, 0, 0.04)" },
+  ocean: { bgColor: "#0b1628", textColor: "#e0f2fe", borderColor: "rgba(56, 189, 248, 0.3)", borderColorPrimary: "rgba(56, 189, 248, 0.6)", bgNode: "rgba(56, 189, 248, 0.06)" },
+  forest: { bgColor: "#0a1a0f", textColor: "#dcfce7", borderColor: "rgba(74, 222, 128, 0.25)", borderColorPrimary: "rgba(74, 222, 128, 0.55)", bgNode: "rgba(74, 222, 128, 0.06)" },
+  sunset: { bgColor: "#1a0a0a", textColor: "#fff7ed", borderColor: "rgba(251, 146, 60, 0.3)", borderColorPrimary: "rgba(251, 146, 60, 0.6)", bgNode: "rgba(251, 146, 60, 0.06)" },
+  purple: { bgColor: "#0f0a1a", textColor: "#ede9fe", borderColor: "rgba(167, 139, 250, 0.3)", borderColorPrimary: "rgba(167, 139, 250, 0.6)", bgNode: "rgba(167, 139, 250, 0.06)" },
+  slate: { bgColor: "#f8fafc", textColor: "#0f172a", borderColor: "rgba(51, 65, 85, 0.2)", borderColorPrimary: "rgba(51, 65, 85, 0.5)", bgNode: "rgba(51, 65, 85, 0.05)" },
+};
+
 const SYSTEM_PROMPT = `Você é um gerador de diagramas técnicos animados para Reels/Stories.
 
 Dado um prompt do usuário descrevendo um conceito técnico, gere um JSON com a estrutura do diagrama.
@@ -21,6 +31,7 @@ REGRAS DE CONTEÚDO:
 - Ferramentas: 3-5 itens relevantes ao contexto
 - toolGroupLabel: nome do grupo (ex: "Ferramentas", "Componentes", "Serviços")
 - Watermark: "NexIA Lab"
+- O campo "theme" será preenchido automaticamente pelo sistema, NÃO inclua no JSON
 
 Retorne APENAS o JSON válido, sem markdown, sem explicações. O JSON deve seguir exatamente esta interface:
 
@@ -28,13 +39,6 @@ Retorne APENAS o JSON válido, sem markdown, sem explicações. O JSON deve segu
   "title": "string",
   "watermark": "NexIA Lab",
   "format": "stories",
-  "theme": {
-    "bgColor": "#0a0a0a",
-    "textColor": "#ffffff",
-    "borderColor": "rgba(255, 255, 255, 0.3)",
-    "borderColorPrimary": "rgba(255, 255, 255, 0.6)",
-    "bgNode": "rgba(255, 255, 255, 0.05)"
-  },
   "toolGroupLabel": "string",
   "nodes": [
     { "id": "string", "label": "string", "x": number, "y": number, "width": number, "height": number, "isPrimary": boolean, "subtitle": "string ou omitir" }
@@ -95,6 +99,8 @@ module.exports = async function handler(req, res) {
     }
 
     const diagram = JSON.parse(jsonStr);
+    const themeKey = body.themeKey || "midnight";
+    diagram.theme = THEME_PRESETS[themeKey] || THEME_PRESETS.midnight;
     return res.status(200).json(diagram);
   } catch (error) {
     return res.status(500).json({ error: error.message || "Failed to generate diagram" });

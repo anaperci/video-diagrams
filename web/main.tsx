@@ -2,8 +2,8 @@ import React, { useState, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { Player, type PlayerRef } from "@remotion/player";
 import { TechDiagram, calcDuration } from "../src/compositions/TechDiagram";
-import type { DiagramData, FormatType, AnimMode, AnimSpeed } from "../src/types";
-import { DEFAULT_DIAGRAM, FORMATS } from "../src/types";
+import type { DiagramData, FormatType, AnimMode, AnimSpeed, ThemePresetKey } from "../src/types";
+import { DEFAULT_DIAGRAM, FORMATS, THEME_PRESETS } from "../src/types";
 
 // ── Design tokens ──
 const C = {
@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [generating, setGenerating] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [visualOpen, setVisualOpen] = useState(false);
+  const [themeKey, setThemeKey] = useState<ThemePresetKey>("midnight");
   const playerRef = useRef<PlayerRef>(null);
 
   const fmt = FORMATS[data.format];
@@ -48,7 +49,7 @@ const App: React.FC = () => {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify({ prompt: prompt.trim(), themeKey }),
       });
       if (!res.ok) {
         let errMsg = `Erro ${res.status}`;
@@ -83,6 +84,12 @@ const App: React.FC = () => {
   };
 
   const setFormat = (f: FormatType) => setData((d) => ({ ...d, format: f }));
+
+  const applyThemePreset = (key: ThemePresetKey) => {
+    setThemeKey(key);
+    const preset = THEME_PRESETS.find((p) => p.key === key);
+    if (preset) setData((d) => ({ ...d, theme: preset.theme }));
+  };
 
   const updateTheme = (key: string, value: string) =>
     setData((d) => ({ ...d, theme: { ...d.theme, [key]: value } }));
@@ -211,6 +218,46 @@ const App: React.FC = () => {
             <span style={{ fontSize: 11, color: C.textDim, marginTop: 4, display: "block" }}>
               {fmt.width}x{fmt.height}
             </span>
+          </div>
+
+          {/* ── Tema ── */}
+          <div>
+            <span style={label}>Tema</span>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+              {THEME_PRESETS.map((preset) => {
+                const active = themeKey === preset.key;
+                return (
+                  <button
+                    key={preset.key}
+                    onClick={() => applyThemePreset(preset.key)}
+                    title={preset.label}
+                    style={{
+                      padding: "6px 0",
+                      background: active ? "rgba(245,197,24,0.12)" : C.input,
+                      border: `1.5px solid ${active ? C.accent : C.inputBorder}`,
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 4,
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: "50%",
+                      background: preset.preview.bg,
+                      border: `2px solid ${preset.preview.accent}`,
+                    }} />
+                    <span style={{ fontSize: 10, color: active ? C.accent : C.textMuted, fontWeight: active ? 700 : 500 }}>
+                      {preset.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* ── Visual (collapsible) ── */}

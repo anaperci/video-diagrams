@@ -66,6 +66,102 @@ export const DEFAULT_THEME: DiagramTheme = {
   bgNode: "rgba(255, 255, 255, 0.05)",
 };
 
+export type ThemePresetKey = "midnight" | "light" | "ocean" | "forest" | "sunset" | "purple" | "slate";
+
+export interface ThemePreset {
+  key: ThemePresetKey;
+  label: string;
+  theme: DiagramTheme;
+  preview: { bg: string; accent: string };
+}
+
+export const THEME_PRESETS: ThemePreset[] = [
+  {
+    key: "midnight",
+    label: "Midnight",
+    preview: { bg: "#0a0a0a", accent: "#ffffff" },
+    theme: {
+      bgColor: "#0a0a0a",
+      textColor: "#ffffff",
+      borderColor: "rgba(255, 255, 255, 0.3)",
+      borderColorPrimary: "rgba(255, 255, 255, 0.6)",
+      bgNode: "rgba(255, 255, 255, 0.05)",
+    },
+  },
+  {
+    key: "light",
+    label: "Clean",
+    preview: { bg: "#f5f5f7", accent: "#1d1d1f" },
+    theme: {
+      bgColor: "#f5f5f7",
+      textColor: "#1d1d1f",
+      borderColor: "rgba(0, 0, 0, 0.15)",
+      borderColorPrimary: "rgba(0, 0, 0, 0.4)",
+      bgNode: "rgba(0, 0, 0, 0.04)",
+    },
+  },
+  {
+    key: "ocean",
+    label: "Ocean",
+    preview: { bg: "#0b1628", accent: "#38bdf8" },
+    theme: {
+      bgColor: "#0b1628",
+      textColor: "#e0f2fe",
+      borderColor: "rgba(56, 189, 248, 0.3)",
+      borderColorPrimary: "rgba(56, 189, 248, 0.6)",
+      bgNode: "rgba(56, 189, 248, 0.06)",
+    },
+  },
+  {
+    key: "forest",
+    label: "Forest",
+    preview: { bg: "#0a1a0f", accent: "#4ade80" },
+    theme: {
+      bgColor: "#0a1a0f",
+      textColor: "#dcfce7",
+      borderColor: "rgba(74, 222, 128, 0.25)",
+      borderColorPrimary: "rgba(74, 222, 128, 0.55)",
+      bgNode: "rgba(74, 222, 128, 0.06)",
+    },
+  },
+  {
+    key: "sunset",
+    label: "Sunset",
+    preview: { bg: "#1a0a0a", accent: "#fb923c" },
+    theme: {
+      bgColor: "#1a0a0a",
+      textColor: "#fff7ed",
+      borderColor: "rgba(251, 146, 60, 0.3)",
+      borderColorPrimary: "rgba(251, 146, 60, 0.6)",
+      bgNode: "rgba(251, 146, 60, 0.06)",
+    },
+  },
+  {
+    key: "purple",
+    label: "Neon",
+    preview: { bg: "#0f0a1a", accent: "#a78bfa" },
+    theme: {
+      bgColor: "#0f0a1a",
+      textColor: "#ede9fe",
+      borderColor: "rgba(167, 139, 250, 0.3)",
+      borderColorPrimary: "rgba(167, 139, 250, 0.6)",
+      bgNode: "rgba(167, 139, 250, 0.06)",
+    },
+  },
+  {
+    key: "slate",
+    label: "Slate",
+    preview: { bg: "#f8fafc", accent: "#334155" },
+    theme: {
+      bgColor: "#f8fafc",
+      textColor: "#0f172a",
+      borderColor: "rgba(51, 65, 85, 0.2)",
+      borderColorPrimary: "rgba(51, 65, 85, 0.5)",
+      bgNode: "rgba(51, 65, 85, 0.05)",
+    },
+  },
+];
+
 export const DEFAULT_DIAGRAM: DiagramData = {
   title: "COMO A IA AGÊNTICA FUNCIONA?",
   watermark: "NexIA Lab",
