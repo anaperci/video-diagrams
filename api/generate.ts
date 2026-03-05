@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-
 const SYSTEM_PROMPT = `Você é um gerador de diagramas técnicos animados para Reels/Stories.
 
 Dado um prompt do usuário descrevendo um conceito técnico, gere um JSON com a estrutura do diagrama.
@@ -49,12 +47,12 @@ Retorne APENAS o JSON válido, sem markdown, sem explicações. O JSON deve segu
   ]
 }`;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { prompt } = req.body;
+  const { prompt } = req.body ?? {};
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "Prompt is required" });
   }
@@ -82,8 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const errBody = await response.text();
-      console.error("Anthropic API error:", response.status, errBody);
-      return res.status(502).json({ error: `Anthropic API error: ${response.status}` });
+      return res.status(502).json({ error: `API error ${response.status}: ${errBody.slice(0, 200)}` });
     }
 
     const message = await response.json();
@@ -97,7 +94,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const diagram = JSON.parse(jsonStr);
     return res.status(200).json(diagram);
   } catch (error: any) {
-    console.error("Generation error:", error);
     return res.status(500).json({ error: error.message || "Failed to generate diagram" });
   }
 }
