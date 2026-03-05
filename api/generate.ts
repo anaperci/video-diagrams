@@ -1,6 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
-
-const client = new Anthropic();
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const SYSTEM_PROMPT = `Você é um gerador de diagramas técnicos animados para Reels/Stories.
 
@@ -51,7 +49,7 @@ Retorne APENAS o JSON válido, sem markdown, sem explicações. O JSON deve segu
   ]
 }`;
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -61,17 +59,36 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: "Prompt is required" });
   }
 
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: "ANTHROPIC_API_KEY not configured" });
+  }
+
   try {
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: prompt }],
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: prompt }],
+      }),
     });
 
-    const text = message.content[0].type === "text" ? message.content[0].text : "";
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error("Anthropic API error:", response.status, errBody);
+      return res.status(502).json({ error: `Anthropic API error: ${response.status}` });
+    }
 
-    // Extract JSON from response (handle potential markdown wrapping)
+    const message = await response.json();
+    const text = message.content?.[0]?.type === "text" ? message.content[0].text : "";
+
     let jsonStr = text.trim();
     if (jsonStr.startsWith("```")) {
       jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");

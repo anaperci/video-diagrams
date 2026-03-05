@@ -51,8 +51,15 @@ const App: React.FC = () => {
         body: JSON.stringify({ prompt: prompt.trim() }),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Erro ao gerar");
+        let errMsg = `Erro ${res.status}`;
+        try {
+          const err = await res.json();
+          errMsg = err.error || errMsg;
+        } catch {
+          const text = await res.text();
+          errMsg = text.slice(0, 100) || errMsg;
+        }
+        throw new Error(errMsg);
       }
       const diagram: DiagramData = await res.json();
       setData(diagram);
