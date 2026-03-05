@@ -10,6 +10,7 @@
     "render:mp4": "remotion render TechDiagram out/diagram.mp4"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@remotion/cli": "^4.0.434",
     "@remotion/fonts": "^4.0.434",
     "@remotion/player": "^4.0.434",

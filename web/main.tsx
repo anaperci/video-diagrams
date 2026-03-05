@@ -9,6 +9,8 @@ import { DEFAULT_DIAGRAM, FORMATS } from "../src/types";
 const App: React.FC = () => {
   const [data, setData] = useState<DiagramData>(DEFAULT_DIAGRAM);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [prompt, setPrompt] = useState("");
+  const [generating, setGenerating] = useState(false);
   const playerRef = useRef<PlayerRef>(null);
 
   const fmt = FORMATS[data.format];
@@ -21,6 +23,40 @@ const App: React.FC = () => {
   const handleReplay = () => {
     playerRef.current?.seekTo(0);
     playerRef.current?.play();
+  };
+
+  const handleGenerate = async () => {
+    if (!prompt.trim() || generating) return;
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Erro ao gerar");
+      }
+      const diagram: DiagramData = await res.json();
+      setData(diagram);
+      // Auto-replay
+      setTimeout(() => {
+        playerRef.current?.seekTo(0);
+        playerRef.current?.play();
+      }, 100);
+    } catch (err: any) {
+      alert("Erro: " + err.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleGenerate();
+    }
   };
 
   const handleExportJSON = () => {
@@ -70,21 +106,70 @@ const App: React.FC = () => {
 
       {/* Main area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        {/* Prompt bar */}
+        <div style={{ padding: "12px 20px", borderBottom: "1px solid #1a1a1a", background: "#060606" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {!sidebarOpen && (
+              <button onClick={() => setSidebarOpen(true)} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "8px 12px", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>
+                Editor
+              </button>
+            )}
+            <div style={{ flex: 1, position: "relative" }}>
+              <input
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Descreva o diagrama... ex: Como funciona o Kubernetes, Arquitetura de microserviços, Pipeline CI/CD"
+                disabled={generating}
+                style={{
+                  width: "100%",
+                  padding: "10px 16px",
+                  paddingRight: 100,
+                  background: "#111",
+                  border: "1px solid #2a2a2a",
+                  borderRadius: 8,
+                  color: "#fff",
+                  fontSize: 14,
+                  fontFamily: "inherit",
+                  outline: "none",
+                  opacity: generating ? 0.5 : 1,
+                }}
+              />
+              <button
+                onClick={handleGenerate}
+                disabled={generating || !prompt.trim()}
+                style={{
+                  position: "absolute",
+                  right: 4,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  padding: "6px 16px",
+                  background: generating ? "#1a1a1a" : "#7c3aed",
+                  border: "none",
+                  borderRadius: 6,
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: generating ? "wait" : "pointer",
+                  opacity: !prompt.trim() ? 0.4 : 1,
+                }}
+              >
+                {generating ? "Gerando..." : "Gerar"}
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Toolbar */}
-        <div style={{ padding: "10px 20px", borderBottom: "1px solid #1a1a1a", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-          {!sidebarOpen && (
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
-              Editor
-            </button>
-          )}
-          <button onClick={handleReplay} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
+        <div style={{ padding: "8px 20px", borderBottom: "1px solid #1a1a1a", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <button onClick={handleReplay} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "5px 12px", fontSize: 11, cursor: "pointer" }}>
             Replay
           </button>
           <div style={{ flex: 1 }} />
-          <button onClick={handleImportJSON} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
+          <button onClick={handleImportJSON} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "5px 12px", fontSize: 11, cursor: "pointer" }}>
             Importar JSON
           </button>
-          <button onClick={handleExportJSON} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
+          <button onClick={handleExportJSON} style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, color: "#fff", padding: "5px 12px", fontSize: 11, cursor: "pointer" }}>
             Exportar JSON
           </button>
           <span style={{ fontSize: 11, color: "#555" }}>
